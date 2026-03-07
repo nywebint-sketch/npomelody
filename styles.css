@@ -12,9 +12,11 @@
       --muted:rgba(255,255,255,.72);
       --stroke:rgba(255,255,255,.14);
       --stroke2:rgba(255,255,255,.10);
-      --card:rgba(8,8,8,.42);
+      --card:rgba(255,255,255,.06);
       --radius:18px;
       --max:1180px;
+      --modal-bg:#060606;
+      --btn-primary-inverted-fg:#0a0a0a;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
@@ -171,7 +173,7 @@
     .nav a{
       color:var(--muted);
       font-size:13px;
-      font-weight:520;
+      font-weight:500;
       letter-spacing:.02em;
       padding:8px 10px;
       border-radius:12px;
@@ -181,6 +183,14 @@
     .nav a:hover{color:var(--fg); background:rgba(255,255,255,.04); border-color:var(--stroke2)}
     .nav a.active{color:var(--fg); background:rgba(255,255,255,.08); border-color:var(--stroke)}
     .right{display:flex; gap:10px; align-items:center; flex-shrink:0; margin-left:auto}
+    .right .btn{
+      width:42px;
+      min-width:42px;
+      height:42px;
+      padding:0;
+      font-size:10px;
+    }
+    .right .btn .sc-icon{width:16px; height:16px}
 
     .btn{
       display:inline-flex; align-items:center; justify-content:center;
@@ -190,7 +200,7 @@
       background: rgba(255,255,255,.06);
       color:var(--fg);
       font-size:13px;
-      font-weight:520;
+      font-weight:500;
       letter-spacing:.02em;
       cursor:pointer;
       transition: transform .12s ease, background .12s ease, border-color .12s ease;
@@ -217,9 +227,10 @@
     main{padding-top:78px}
     section{padding:56px 0; border-bottom:1px solid rgba(255,255,255,.06)}
     .head{display:flex; align-items:flex-end; justify-content:space-between; gap:14px; margin-bottom:18px}
+    .artist-search{max-width:220px}
     h1,h2{margin:0}
     h1{font-size: clamp(36px, 4.8vw, 68px); line-height:1.04; letter-spacing:.02em; font-weight:560}
-    h2{font-size:clamp(20px, 2vw, 28px); line-height:1.15; letter-spacing:.015em; font-weight:520}
+    h2{font-size:clamp(20px, 2vw, 28px); line-height:1.15; letter-spacing:.015em; font-weight:500}
     .sub{margin-top:10px; color:var(--muted); max-width:760px; font-size:clamp(15px, .35vw + 14px, 18px); line-height:1.55}
     b,strong{font-weight:560}
 
@@ -229,12 +240,12 @@
     .g4{grid-template-columns: repeat(4, minmax(0,1fr))}
 
     .card{
-      border:1px solid var(--stroke2);
+      border:none;
       background: var(--card);
       border-radius: var(--radius);
       overflow:hidden;
       backdrop-filter: blur(8px);
-      box-shadow:0 12px 36px rgba(0,0,0,.35);
+      box-shadow:none;
     }
     .open-card{
       cursor:pointer;
@@ -254,6 +265,47 @@
     .open-card:focus-visible{
       outline:2px solid rgba(255,255,255,.35);
       outline-offset:2px;
+    }
+    /* Такой же эффект отображения как у карточек афиши: полупрозрачный фон, инверсия при наведении */
+    .open-card{
+      width:100%;
+      max-width:100%;
+      box-sizing:border-box;
+      background:var(--card);
+      border:none;
+      box-shadow:none;
+      transition:background .25s ease, border-color .25s ease, box-shadow .25s ease, color .25s ease;
+    }
+    .open-card:hover,
+    .open-card:active,
+    .open-card.is-pressed{
+      background:#fff !important;
+      border-color:transparent !important;
+      box-shadow:none !important;
+      color:#000 !important;
+    }
+    .open-card:hover *:not(img):not(svg),
+    .open-card:active *:not(img):not(svg),
+    .open-card.is-pressed *:not(img):not(svg){
+      color:#000 !important;
+      border-color:rgba(0,0,0,.2) !important;
+    }
+    .open-card:hover .tag,
+    .open-card:active .tag,
+    .open-card.is-pressed .tag{
+      background:transparent !important;
+      color:#000 !important;
+    }
+    .open-card:hover .catalog-title,
+    .open-card:hover .artist-card-name,
+    .open-card:hover .catalog-meta,
+    .open-card:active .catalog-title,
+    .open-card:active .artist-card-name,
+    .open-card:active .catalog-meta,
+    .open-card.is-pressed .catalog-title,
+    .open-card.is-pressed .artist-card-name,
+    .open-card.is-pressed .catalog-meta{
+      font-weight:900;
     }
     #artistsGrid .open-card .pad{
       padding:12px;
@@ -470,6 +522,27 @@
       display:flex; align-items:center; justify-content:center;
       padding:12px;
     }
+    /* Медиа в карточках сеток — как в афише: без рамки, на всю ширину */
+    #artistsGrid .open-card .media,
+    #releasesGrid .open-card .media{
+      width:100%;
+      max-width:100%;
+      padding:0;
+      border:none;
+      background:transparent;
+      overflow:hidden;
+      display:block;
+      aspect-ratio:unset;
+    }
+    #artistsGrid .open-card .media img,
+    #releasesGrid .open-card .media img{
+      width:100%;
+      height:auto;
+      display:block;
+      object-fit:contain;
+      max-width:100%;
+      vertical-align:top;
+    }
     .media.square{aspect-ratio:1/1}
     .media.wide{aspect-ratio:16/9}
     .media img{
@@ -485,7 +558,75 @@
     .media.cover img{
       object-fit:cover;
     }
-    #eventsGrid .event-media img{object-fit:cover}
+    /* Афиша: такой же эффект — полупрозрачный фон, при наведении инверсия */
+    #eventsGrid .event-card{
+      box-sizing:border-box;
+      width:100%;
+      max-width:100%;
+      background:var(--card);
+      border:none;
+      box-shadow:none;
+      transition:background .25s ease, box-shadow .2s ease, border .2s ease;
+      overflow:visible;
+    }
+    #eventsGrid .event-card:hover{
+      background:#fff;
+      border:none;
+      box-shadow:none;
+    }
+    #eventsGrid .event-card:hover .event-card-title,
+    #eventsGrid .event-card:hover .event-card-date{
+      color:#000 !important;
+      font-weight:900;
+    }
+    #eventsGrid .event-card:active{
+      background:#fff;
+    }
+    #eventsGrid .event-card:active .event-card-title,
+    #eventsGrid .event-card:active .event-card-date{
+      color:#000 !important;
+    }
+    #eventsGrid .event-card .pad{
+      display:flex;
+      flex-direction:row;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+    }
+    #eventsGrid .event-card .event-card-title{
+      text-align:left;
+      flex:1;
+      min-width:0;
+    }
+    #eventsGrid .event-card .event-card-date{
+      text-align:right;
+      flex-shrink:0;
+    }
+    #eventsGrid .event-card .event-card-title,
+    #eventsGrid .event-card .event-card-date{
+      transition:font-weight .18s ease, color .25s ease;
+    }
+    #eventsGrid .event-poster,
+    #eventsGrid .event-media{
+      width:100%;
+      max-width:100%;
+      height:auto;
+      overflow:hidden;
+      padding:0;
+      aspect-ratio:unset;
+      border:none;
+      background:transparent;
+      display:block;
+    }
+    #eventsGrid .event-poster img,
+    #eventsGrid .event-media img{
+      width:100%;
+      height:auto;
+      display:block;
+      object-fit:contain;
+      max-width:100%;
+      vertical-align:top;
+    }
 
     .auth-forms{
       gap:10px;
@@ -521,8 +662,191 @@
       background:rgba(255,255,255,.03);
       color:var(--fg);
       outline:none;
+      transition:border-color .15s ease, background .15s ease;
+    }
+    .input::placeholder,
+    textarea::placeholder{
+      color:rgba(255,255,255,.45);
+    }
+    .input:focus,
+    textarea:focus{
+      border-color:rgba(255,255,255,.28);
+      background:rgba(255,255,255,.05);
     }
     textarea{min-height:110px; resize:vertical}
+
+    /* Modal */
+    .modal-overlay{
+      position:fixed; inset:0; z-index:100; display:none;
+      align-items:center; justify-content:center; padding:18px;
+      background:rgba(0,0,0,.70); backdrop-filter:blur(8px);
+    }
+    .modal-inner{
+      width:min(920px, 100%);
+      max-width:100vw;
+      max-height:86vh;
+      overflow-x:hidden;
+      overflow-y:auto;
+      border:1px solid var(--stroke);
+      background:var(--modal-bg);
+      box-sizing:border-box;
+    }
+    .modal-header{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      position:relative;
+      padding:18px 20px;
+      border-bottom:1px solid var(--stroke2);
+      min-height:72px;
+    }
+    .modal-header-text{
+      min-width:0;
+      text-align:center;
+    }
+    .modal-header .btn.ghost{
+      position:absolute;
+      right:20px;
+      top:50%;
+      transform:translateY(-50%);
+    }
+    .modal-title{
+      font-weight:700;
+      letter-spacing:.02em;
+      font-size:clamp(18px, 2vw, 22px);
+      line-height:1.2;
+    }
+    .modal-sub{
+      margin-top:6px;
+      font-size:13px;
+      color:rgba(255,255,255,.78);
+      line-height:1.4;
+    }
+    .modal-body{background:transparent}
+
+    /* Booking form in modal */
+    #mBody .booking-form-modal{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+    #mBody .booking-form-modal .input,
+    #mBody .booking-form-modal textarea{
+      padding:11px 14px;
+      border-radius:10px;
+    }
+    #mBody .booking-form-modal .btn.primary{
+      margin-top:6px;
+      padding:12px 20px;
+      font-size:14px;
+      font-weight:600;
+      background:rgba(255,255,255,.95);
+      color:var(--btn-primary-inverted-fg);
+      border-color:rgba(255,255,255,.95);
+    }
+    #mBody .booking-form-modal .btn.primary:hover{
+      background:#fff;
+      border-color:#fff;
+      color:var(--btn-primary-inverted-fg);
+    }
+    #mBody .booking-form-modal .booking-status{
+      font-size:13px;
+      color:rgba(255,255,255,.6);
+    }
+    #mBody .card.pad > b:first-child{
+      display:block;
+      font-size:15px;
+      font-weight:600;
+      letter-spacing:.02em;
+      margin-bottom:2px;
+    }
+    #mBody .card.pad .muted{
+      color:rgba(255,255,255,.72);
+    }
+    #mBody .card .pad .muted{
+      color:rgba(255,255,255,.78);
+      font-style:italic;
+      line-height:1.5;
+    }
+    #mBody .card .media.square{
+      border:1px solid var(--stroke2);
+      background:rgba(0,0,0,.4);
+    }
+    #mBody .tag{
+      color:rgba(255,255,255,.88);
+      border-color:rgba(255,255,255,.12);
+    }
+    .event-modal-wrap{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      grid-template-rows:auto auto;
+      gap:14px;
+    }
+    .event-modal-wrap .event-modal-left{
+      grid-column:1;
+      grid-row:1;
+    }
+    .event-modal-wrap .event-modal-right{
+      grid-column:2;
+      grid-row:1 / -1;
+    }
+    .event-modal-wrap .event-modal-actions{
+      grid-column:1;
+      grid-row:2;
+      display:flex;
+      justify-content:center;
+      padding-top:6px;
+    }
+    #mBody .event-modal-actions .event-ticket-btn,
+    .event-modal-wrap .event-modal-actions .event-ticket-btn{
+      justify-content:center;
+      padding:10px 16px;
+      font-size:13px;
+      background:transparent !important;
+      border:1px solid transparent !important;
+      color:rgba(255,255,255,.78);
+      transition:color .18s ease, background .18s ease, border-color .18s ease;
+    }
+    #mBody .event-modal-actions .event-ticket-btn:hover,
+    #mBody .event-modal-actions .event-ticket-btn:active,
+    .event-modal-wrap .event-modal-actions .event-ticket-btn:hover,
+    .event-modal-wrap .event-modal-actions .event-ticket-btn:active{
+      color:var(--fg);
+      background:rgba(255,255,255,.04) !important;
+      border-color:rgba(255,255,255,.14) !important;
+    }
+    #mBody .event-modal-left{
+      width:fit-content;
+      max-width:100%;
+      margin:0 auto;
+      justify-self:center;
+      background:transparent;
+      border:none;
+      box-shadow:none;
+      outline:none;
+    }
+    #mBody .event-modal-left .media{
+      padding:0;
+      background:transparent;
+      border:none;
+      aspect-ratio:unset;
+      height:auto;
+      display:flex;
+      justify-content:center;
+    }
+    #mBody .event-modal-left .media img{
+      width:auto;
+      height:auto;
+      max-width:100%;
+      display:block;
+      vertical-align:top;
+    }
+    #mBody .event-modal-right .muted,
+    #mBody .event-modal-right .tag,
+    .event-modal-wrap .event-modal-right .muted,
+    .event-modal-wrap .event-modal-right .tag{
+      font-weight:700;
+    }
 
     footer{padding:24px 0 40px; color:var(--muted); font-size:14px}
 
@@ -572,10 +896,16 @@
         top:50%;
         transform:translateY(-50%);
       }
+      .right .btn{
+        width:38px;
+        min-width:38px;
+        height:38px;
+        font-size:9px;
+      }
+      .right .btn .sc-icon{width:14px; height:14px}
       main{padding-top:68px}
       .mobile-menu{top:68px}
       .mobile-menu-backdrop{inset:68px 0 0 0}
-      .right .btn{display:none}
       h1{font-size:clamp(28px, 8.2vw, 44px); line-height:1.06}
       h2{font-size:clamp(18px, 5.8vw, 22px)}
       body{font-size:15px; line-height:1.45}
@@ -654,16 +984,120 @@
       .catalog-meta{
         font-size:10px;
       }
-      #eventsGrid,
       #artistsGrid,
       #releasesGrid,
       #merchGrid{
         grid-template-columns:repeat(2, minmax(0,1fr)) !important;
         gap:8px;
       }
+      #eventsGrid{
+        grid-template-columns:repeat(2, minmax(0,1fr)) !important;
+        gap:8px;
+      }
       #podcastsGrid,
       #streamsList{
         gap:8px;
+      }
+      #mBody .event-modal-left,
+      #mBody .event-modal-left .card{
+        overflow:visible;
+      }
+      #mBody .event-modal-left .pad .btn{
+        max-width:100%;
+        word-break:break-word;
+      }
+      #eventsGrid .event-poster,
+      #eventsGrid .event-media{
+        aspect-ratio:unset !important;
+        height:auto !important;
+        overflow:visible;
+      }
+      #eventsGrid .event-poster img,
+      #eventsGrid .event-media img{
+        width:100%;
+        height:auto;
+        object-fit:contain;
+      }
+    }
+
+    @media (max-width: 768px){
+      .event-card{
+        padding:12px;
+        width:100%;
+        box-sizing:border-box;
+      }
+      .event-card .pad{
+        padding:12px 0 0;
+      }
+      #eventsGrid .event-poster,
+      #eventsGrid .event-media{
+        width:100%;
+        margin:-12px -12px 0;
+        padding:0;
+        border:none;
+        background:transparent;
+        aspect-ratio:unset;
+        height:auto;
+        overflow:visible;
+      }
+      #eventsGrid .event-poster img,
+      #eventsGrid .event-media img{
+        width:100%;
+        height:auto;
+        display:block;
+        object-fit:contain;
+        max-width:100%;
+      }
+      #eventsGrid{
+        grid-template-columns:repeat(2, minmax(0,1fr));
+        gap:8px;
+      }
+      .event-modal-wrap{
+        grid-template-columns:1fr;
+        grid-template-rows:auto auto auto;
+        min-width:0;
+      }
+      .event-modal-wrap .event-modal-left{
+        grid-row:1;
+      }
+      .event-modal-wrap .event-modal-right{
+        grid-column:1;
+        grid-row:2;
+        min-width:0;
+      }
+      #mBody .event-modal-left{
+        max-width:100%;
+        width:100%;
+      }
+      #mBody .event-modal-left .media img{
+        max-width:100%;
+        width:100%;
+        height:auto;
+      }
+      #mBody .modal-body{
+        min-width:0;
+        overflow-x:hidden;
+      }
+      .event-modal-wrap .event-modal-actions{
+        grid-column:1;
+        grid-row:3;
+        padding-top:8px;
+      }
+      .event-modal-actions .event-ticket-btn{
+        width:100%;
+        max-width:100%;
+        background:transparent !important;
+        border:1px solid transparent;
+        color:rgba(255,255,255,.78);
+        padding:11px 12px;
+        font-size:14px;
+        transition:color .18s ease, background .18s ease, border-color .18s ease;
+      }
+      .event-modal-actions .event-ticket-btn:hover,
+      .event-modal-actions .event-ticket-btn:active{
+        color:var(--fg);
+        background:rgba(255,255,255,.04) !important;
+        border-color:rgba(255,255,255,.14);
       }
     }
 
@@ -678,10 +1112,12 @@
       #streamNext{font-size:11px; padding:6px 9px}
 
       /* Keep compact grids on very small screens */
-      #eventsGrid,
       #artistsGrid,
       #releasesGrid,
       #merchGrid{
+        grid-template-columns:repeat(2, minmax(0,1fr)) !important;
+      }
+      #eventsGrid{
         grid-template-columns:repeat(2, minmax(0,1fr)) !important;
       }
       .media{
@@ -696,6 +1132,13 @@
       .brand{gap:9px}
       .brand-name{font-size:31px}
       .brand-mark{width:36px; height:36px; font-size:19px}
+      .right .btn{
+        width:36px;
+        min-width:36px;
+        height:36px;
+        font-size:8px;
+      }
+      .right .btn .sc-icon{width:12px; height:12px}
       .btn{padding:8px 11px; font-size:13px}
       .tag{padding:5px 8px}
       .mobile-menu a{font-size:13px}
