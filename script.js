@@ -300,13 +300,17 @@ function createMedia(imgSrc, imgAlt, className = "media") {
   const img = document.createElement("img");
 
   const defaultLogo = "https://rvswpgsxutfcpgvmzonr.supabase.co/storage/v1/object/public/images/logo.png";
-  let src = imgSrc;
+  const raw = String(imgSrc || "").trim();
 
-  // Если пути нет, или база вернула старое значение 'logo.png'
-  if (!src || src === "logo.png" || src === "smile.png") {
+  let src;
+  if (!raw || raw === "logo.png" || raw === "smile.png") {
     src = defaultLogo;
-  } else if (!/^https?:\/\//i.test(src)) {
-    src = ASSET_PREFIX + src.replace(/^\/+/, '');
+  } else if (/^https?:\/\//i.test(raw)) {
+    src = raw;
+  } else if (ASSET_PREFIX) {
+    src = ASSET_PREFIX + raw.replace(/^\/+/, "");
+  } else {
+    src = defaultLogo;
   }
 
   img.src = src;
